@@ -1,241 +1,184 @@
-# Circle-Qt 视觉算法测试工具 - 用户手册
+# VisionLab — User Manual
 
-## 📖 软件功能介绍
+## What it is
 
-Circle-Qt 是一款专业的视觉算法测试工具，主要用于：
-- **圆拟合**：精确提取图像中的圆形特征
-- **直线拟合**：准确检测图像中的直线元素
-- **批量处理**：批量分析多张图像中的几何特征
-- **参数调优**：直观调节算法参数以获得最佳效果
+VisionLab is a machine-vision tool for **industrial inspection and measurement**. It is
+built around a set of sub-pixel fitting algorithms and a **process-chain recipe** engine,
+and can run either standalone (interactive) or embedded (driven by a host application over
+IPC).
 
-## 🖥️ 界面布局说明
+Main capabilities:
 
-### 主界面结构
+- **Shape fitting** — circle, line, ellipse, rectangle (sub-pixel).
+- **Template matching** (gradient-orientation, rotation-invariant).
+- **Blob analysis**, **golden-template diff**, **scratch** / **crack** detection.
+- **OCR** (DNN / dot-matrix / VLM), **barcode / QR**, **DataMatrix**.
+- **Unsupervised anomaly detection** for unknown defects (library built from good parts).
+- **Batch processing** with statistics and CSV export.
+- **Recipes** — ordered steps + preprocessing + between-step PASS/NG logic.
+
+## Main window
+
 ```
-┌─────────────────────────────────────────────────────┐
-│  [菜单栏] 文件 | 算法 | 帮助                        │
-├─────────────────────────────────────────────────────┤
-│  ┌─────────────┬──────────────────────────────────┐ │
-│  │             │  [控制面板]                       │ │
-│  │             │  ┌─────────────────────────────┐ │ │
-│  │   图像显示   │  │  算法选择                    │ │ │
-│  │     区域     │  │  ROI参数设置                 │ │ │
-│  │             │  │  算法参数调整                │ │ │
-│  │             │  │  边缘检测方法                │ │ │
-│  │             │  │  执行按钮                    │ │ │
-│  │             │  └─────────────────────────────┘ │ │
-│  └─────────────┴──────────────────────────────────┘ │
-└─────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────┐
+│  Menu: File | Algorithm | Help                          │
+├───────────────────────┬─────────────────────────────────┤
+│                       │  Control panel                   │
+│   Image display       │   - algorithm selection          │
+│   (ROI, results,      │   - ROI parameters               │
+│    overlays)          │   - algorithm parameters         │
+│                       │   - edge-detection method        │
+│                       │   - Search / Batch Search        │
+└───────────────────────┴─────────────────────────────────┘
 ```
 
-### 控制面板各区域功能
+- **Search** — run the current algorithm on the current image.
+- **Batch Search** — run over a folder of images; shows a statistics summary.
 
-**算法选择区域**：
-- 选择当前使用的算法（圆拟合/直线拟合）
+## Parameters
 
-**ROI参数设置区域**：
-- 设置感兴趣区域的中心位置、大小、角度等参数
+### Circle fit
 
-**算法参数区域**：
-- 调整具体的算法参数以获得最佳拟合效果
-
-**边缘检测方法**：
-- 选择使用Canny或Devernay亚像素边缘检测
-
-**执行按钮**：
-- `Search`：单张图片处理
-- `Batch Search`：批量图片处理
-
-## ⚙️ 参数含义解释
-
-### 圆拟合参数
-
-| 参数名称 | 说明 | 推荐范围 |
-|----------|------|----------|
-| Center X/Y | ROI中心点坐标 | 0-图像宽高 |
-| Inner Radius | 环形ROI内半径 | 0-500像素 |
-| Outer Radius | 环形ROI外半径 | 0-500像素 |
-| Radius Min/Max | 拟合圆的半径范围 | 0-500像素 |
-| Radius Tol | 半径容差 | 0.1-100像素 |
-| Angle Gap | 角度间隙阈值 | 1-90度 |
-
-### 直线拟合参数
-
-| 参数名称 | 说明 | 推荐范围 |
-|----------|------|----------|
-| Center X/Y | 旋转矩形ROI中心坐标 | 0-图像宽高 |
-| Length | 矩形长度 | 10-1000像素 |
-| Width | 矩形宽度 | 5-200像素 |
-| Angle | 旋转角度 | 0-360度 |
-
-### 通用参数
-
-| 参数名称 | 说明 | 推荐范围 |
-|----------|------|----------|
-| Iterations | RANSAC迭代次数 | 10-5000次 |
-| Inlier Dist | 内点距离阈值 | 0.1-50像素 |
-| Min Inliers | 最少内点数 | 3-1000个 |
-| Canny Low/High | Canny边缘检测阈值 | 1-500 |
-| Sobel Ksize | Sobel算子核大小 | 1, 3, 5, 7 |
-| Subpixel Step | 亚像素优化步长 | 0.05-2.0像素 |
-
-## 🧪 操作步骤示例
-
-### 示例1：圆拟合基本操作
-1. **打开图像**：点击 `📁 Open Image` 按钮加载待处理图片
-2. **选择算法**：在算法选择下拉框中选择"亚像素圆拟合"
-3. **设置ROI**：调整ROI中心至预期圆心位置，设置内外半径包围目标圆
-4. **参数调整**：根据图像特点微调圆拟合相关参数
-5. **执行搜索**：点击 `▶ Search` 按钮执行圆拟合算法
-6. **查看结果**：在图像显示区域查看拟合结果和状态栏信息
-
-### 示例2：直线拟合操作
-1. **打开图像**：点击 `📁 Open Image` 按钮加载待处理图片
-2. **选择算法**：在算法选择下拉框中选择"直线拟合"
-3. **设置ROI**：使用旋转矩形ROI包围待检测直线
-4. **参数调整**：根据图像特点调整直线拟合参数
-5. **执行搜索**：点击 `▶ Search` 按钮执行直线拟合算法
-6. **查看结果**：在图像显示区域查看拟合结果和状态栏信息
-
-### 示例3：参数优化策略
-1. **粗调**：首先调整ROI参数，确保覆盖目标区域
-2. **细调**：逐步调整算法参数，观察拟合精度变化
-3. **验证**：使用不同测试图像验证参数鲁棒性
-4. **记录**：保存最优参数组合用于同类场景
-
-### 示例4：批量处理
-1. **准备图像**：将待处理图像存放在同一文件夹
-2. **设置参数**：在单图测试中确定最优参数
-3. **批量执行**：点击 `📂 Batch Search` 按钮
-4. **查看报告**：在弹出的结果对话框中查看统计信息
-
-### 示例5：边缘检测方法选择
-- **Canny**：适合边缘清晰的场景，速度较快
-- **Devernay**：适合需要更高精度的亚像素检测，精度更高但速度稍慢
-
-## ❓ 常见问题FAQ
-
-**Q: 图像加载失败怎么办？**
-A: 检查图像格式是否支持（BMP、PNG、JPG、JPEG），以及文件路径是否有中文或特殊字符。
-
-**Q: 圆拟合不准确怎么解决？**
-A:
-- 调整ROI大小，确保恰好包围目标圆
-- 优化半径范围参数
-- 尝试不同的边缘检测方法（Canny/Devernay）
-- 增加RANSAC迭代次数
-
-**Q: 如何提高拟合精度？**
-A:
-- 使用Devernay亚像素边缘检测
-- 增加迭代次数
-- 减小内点距离阈值
-- 调整亚像素优化步长
-
-**Q: 批量处理结果如何分析？**
-A: 批量处理完成后会弹出结果对话框，包含成功/失败统计、平均执行时间等信息，可以导出为CSV格式进一步分析。
-
-**Q: 检测结果如何保存/追溯？**
-A: 每次检测自动写入 `<exe>/results.db`（SQLite）；NG 图自动复制到 `<exe>/archive/ng/<日期>/`。可用任意 SQLite 工具查询 results.db。
-
-**Q: 参数如何保存和加载？**
-A: 软件会自动保存最后一次使用的参数，重启后会自动加载。也可以通过调整滑块记住最常用的参数组合。
-
-**Q: 什么是ROI？为什么重要？**
-A: ROI (Region of Interest) 是"感兴趣区域"，限制算法在指定区域内寻找特征，避免误检和提高速度。
-
-**Q: 拟合结果显示红色是什么意思？**
-A: 红色表示拟合失败，通常需要重新调整ROI或算法参数。
-
-## 💡 高级技巧
-
-**ROI调整技巧**：
-- 可以通过图像显示区域的鼠标拖拽直接调整ROI位置和大小
-- 优先保证ROI准确包含目标特征
-
-**参数调试方法**：
-- 从默认参数开始，一次只调整一个参数
-- 记录每次调整对结果的影响
-- 建立针对特定场景的最佳参数组合
-
-**性能优化**：
-- 尽量缩小ROI区域以减少计算量
-- 根据精度要求选择合适的边缘检测方法
-- 合理设置RANSAC参数平衡速度和精度
-
-## 🧩 工艺链配方（Recipe）
-
-**配方 = 一个工件/工序的完整检测程序**：有序检测步骤（每步 = 算法 + 参数 + ROI）+ 预处理管线 + 步骤间判定逻辑（AND/OR + 几何约束）。
-
-- **保存/加载**：左侧"配方名称 + 保存配方/加载配方"，整套工艺存到 `<exe>/recipes/<名称>.json`。
-- **工艺步骤**：`+ 添加当前算法` 把当前调好的算法加入工艺；可 上移/下移/编辑/移除。支持 **12 类算法**：圆/线/椭圆/矩形拟合、模板匹配、Blob 分析、黄金模板比对、划痕检测、裂纹检测、OCR、条码/QR、DataMatrix。
-- **多点位（Shot）分组**：对某步骤"编辑" → 弹窗中选"拍照点位 (Shot)"（可"分组到新 Shot"），并为该点位设置**图像路径**（离线用；空 = 当前/推送图）、**位置 X/Y**、**图像槽**与 **emit 标签**（聚合拟合点源）。步骤列表以 `Shot k · n. 算法` 显示。多点位配方保存为 **v4**（`shots` 数组），单点位保持 **v3** 兼容格式。
-- **聚合拟合（跨点位）**：左栏"聚合拟合"区可添加 `fit_rect_from_points` / **`fit_rect_from_lines`（4 边定矩形）** / `fit_line_from_points` / `fit_circle_from_points`，填入各步骤的 emit 标签。`fit_rect_from_lines` 取 4 条 `line_fit` 边线的直线方程，两两求交得 4 个角点，输出矩形中心/角度/长宽。运行后在**所有点位跑完**时执行，结果弹窗中该行 Shot 显示"聚合"、缺陷列显示 shape 类型与尺寸。含聚合拟合的配方存为 **v4.1**。
-- **判定**：下拉框选择 `AND(全部通过)` / `OR(任一通过)`。
-- **步骤间约束**：添加/移除约束（中心距 / 半径比 / 尺寸比 / 角度差 / 多步骤等距 / 到参考线距离 / 对称度），距离与对称类可选 px 或 mm 判定。聚合拟合结果也可作为约束引用（按扁平步骤序）。
-- **运行配方**：`▶ 运行配方` 在后台按顺序执行全部步骤。多点位配方弹窗按 shot 分组显示 **# / Shot / 算法 / 位姿 / 有无 / 缺陷 / 字符串 / 状态 / 耗时** + 约束表 + 整体判定；单点位沿用原结果表。
-- **黄金模板步骤**：保存配方时模板图像路径写入配方；运行配方时按路径加载，若文件缺失该步骤判 NG。
-
-详细说明、JSON 格式（含 v4 多点位）、语义结果 schema 与 IPC 宿主协议：
-
-👉 **[工艺链配方与步骤间几何约束指南](RECIPE_GUIDE.md)**
-
-👉 **[配方 IPC 协议（RunRecipe / 语义化结果）](RECIPE_IPC_PROTOCOL.md)**
-
-## 🖱️ 工程 / 运行模式
-
-工具栏右侧的 `🔧 工程` / `▶ 运行` 按钮在两种模式间一键切换，选择会保存并在下次启动时自动恢复。
-
-| 模式 | 用途 | 界面 |
+| Parameter | Meaning | Typical range |
 |---|---|---|
-| **工程模式**(默认) | 调试配方、调整算法参数、标定 ROI | 显示全部控件：配方编辑栏、算法树、右侧参数面板、Run/Batch/Load Config 工具栏按钮；ROI 可拖拽/缩放 |
-| **运行模式** | 产线执行，避免误改参数 | 隐藏配方编辑栏、算法树、参数面板与 Run/Batch/Load Config；保留 **工艺步骤/约束列表**（只读展示）与 **▶ 运行配方** 按钮；ROI 锁定为只读（不能拖动） |
+| Center X/Y | ROI center | image bounds |
+| Inner / Outer Radius | annular ROI radii | 0–500 px |
+| Radius Min / Max | accepted fit radius | 0–500 px |
+| Radius Tol | radius tolerance (pre-filter) | 0.1–100 px |
+| Angle Gap | gap threshold for isolated points | 1–90° |
 
-> 运行模式下仍可加载图像、查看结果面板与图像画面，并照常执行"运行配方"；配方加载与参数写入在隐藏控件上依然生效，不会因面板隐藏而失效。
+### Line fit
 
-## 📊 结果追溯（SQLite 落库与 NG 归档）
-
-每次检测（单张或批量）都会自动写入 SQLite 数据库并归档 NG 图像：
-
-| 内容 | 位置 | 说明 |
+| Parameter | Meaning | Typical range |
 |---|---|---|
-| 检测结果库 | `<exe>/results.db` | 表 `inspection_results`：时间/算法/图像/相机/OK-NG/测量值 JSON/批次；配方运行时**每步骤一行**，含 `is_recipe`、`recipe_name`、`shot_index`、`step_index`、`total_steps` |
-| NG 图像归档 | `<exe>/archive/ng/<日期>/` | 检测 NG 的源图自动复制，便于复查 |
+| Center X/Y | rotated-rect ROI center | image bounds |
+| Length / Width | ROI length / width | 10–1000 / 5–200 px |
+| Angle | ROI orientation | 0–360° |
 
-> 配方（UI 或 IPC）运行的每个步骤都会写入一行，`measurements` 存该步骤的**语义 JSON**（位姿/有无/缺陷/字符串）。IPC 配方行以 `recipe_name = "IPC-<cmdId>"` 标识。
->
-> **部署注意**：首次使用需在 exe 同级目录放置 `sqldrivers/qsqlite.dll`（SQLite 驱动）以及 `Qt6Sql.dll`、`Qt6Concurrent.dll`，否则落库会静默失效。旧版本创建的 `results.db` 会自动迁移（缺列则 `ALTER TABLE` 补列）。
+### Common
 
-## 🖼️ 调试图像留存（追溯失败原因 / 复现）
-
-结果面板勾选 **"自动保存调试图"** 后，**每次执行算法**（单张检测 / 配方每个步骤）都会保存一组文件，用于事后追溯"为什么没识别出来"并**复现**：
-
-| 文件 | 内容 | 用途 |
+| Parameter | Meaning | Typical range |
 |---|---|---|
-| `<时间戳>_<标签>_ok/ng_orig.png` | **原图** | 复现：加载后重跑同参数 |
-| `<时间戳>_<标签>_ok/ng_result.png` | **结果图**：原图 + **ROI 框** + 拟合(线/圆/椭圆/矩形) + 调试点 + 顶部 `OK/NG` 判定条 | 一眼看出 **ROI 是否画错**、**ROI 内有没有可识别的目标**、拟合是否偏到别处 |
-| `<时间戳>_<标签>_ok/ng.json` | 算法 + **完整参数(含 ROI)** + 测量值 + 状态/详情 + 图像路径/相机/`px_per_mm` | 定位失败原因、精确复现 |
+| Iterations | RANSAC iterations | 10–5000 |
+| Inlier Dist | inlier distance threshold | 0.1–50 px |
+| Min Inliers | minimum inliers | 3–1000 |
+| Canny Low/High | Canny thresholds | 1–500 |
+| Sobel Ksize | Sobel kernel size | 1, 3, 5, 7 |
+| Subpixel Step | sub-pixel refinement step | 0.05–2.0 px |
 
-- **标签**：单张检测 = 算法名（如 `circle_fit`）；配方步骤 = `shot2_step1_circle_fit`（哪一拍照位、第几步）。
-- **存放位置（按天分目录）**：`<目录>/<yyyy-MM-dd>/`，例如 `debug_captures/2026-09-13/...`。便于浏览，也可按天/周/月整段删除。缺省目录 `<exe>/debug_captures`。
-- **开关**：`自动保存调试图`（总开关）、`仅NG`（只存失败的，省磁盘）、`目录…`（保存位置）、`上限 (MB)`（超过后提示清理）。设置持久化，重启保留。
-- **占用显示与清理**：面板显示 `占用 X MB / N 文件`；超过 `上限` 时变黄提示"建议清理"。点 **`刷新`** 立即重算；点 **`清理`** 按"从最旧文件开始删除，直到 ≤ 上限"执行（删除前弹确认，并清理空的按天目录）。占用在每次检测/配方结束后自动刷新（≥2s 节流，避免频繁遍历目录）。
-- **典型排查**：`result.png` 里 ROI 框到空处 → ROI 画错；ROI 框住目标但结果 NG → 参数（阈值/半径范围/极性）问题；两者都正常但离线复现不同 → 图像/标定差异。
-- **复现**：用 `_orig.png` 作为输入、按 `.json` 里的 `params` 重设参数后重跑，结果应与当时一致。
-- **不压缩**：PNG 已自带压缩，再打包收益很小；建议用"按天分目录 + 上限清理"控制占用，而非 zip。
+## Workflows
 
-## 📐 测量算法详细说明
+**Circle fit.** Open image → select "Sub-pixel circle fit" → set the ROI center to the
+expected center and the inner/outer radii to enclose the target circle → tune parameters →
+**Search** → read the result in the image and status bar.
 
-圆弧拟合、卡尺、角点检测算法的完整参数说明和使用指南，请参阅：
+**Line fit.** Open image → select "Line fit" → enclose the line with the rotated-rect ROI →
+tune → **Search**.
 
-👉 **[测量算法使用指南](ALGO_USAGE_GUIDE.md)**
+**Tuning.** Coarse first (ROI covers the target), then fine (one parameter at a time),
+then validate across several images, then save the parameter set for similar scenes.
 
----
+**Batch.** Put images in one folder → fix the parameters on a single-image test →
+**Batch Search** → review the summary (success/failure counts, average time); export CSV.
 
-## 🆘 技术支持
+**Edge detection.** *Canny*: fast, for crisp edges. *Devernay*: sub-pixel, more accurate but
+slower.
 
-如遇到软件使用问题，请：
-1. 查看本手册常见问题
-2. 检查参数设置是否合理
-3. 尝试默认参数看是否正常工作
-4. 联系技术支持（如适用）
+## FAQ
+
+- **Image won't load?** Check the format (BMP/PNG/JPG/JPEG) and the path (non-ASCII paths).
+- **Circle fit inaccurate?** Fit the ROI to the circle exactly; tighten the radius range;
+  try the other edge detector; raise RANSAC iterations.
+- **Improve accuracy?** Use Devernay sub-pixel; raise iterations; lower the inlier distance;
+  adjust the sub-pixel step.
+- **Batch results?** A results dialog gives success/failure counts and average time; export CSV.
+- **Result traceability?** Every detection is written to `<exe>/results.db` (SQLite); NG
+  source images are copied to `<exe>/archive/ng/<date>/`.
+- **Parameter persistence?** The last-used parameters are restored on restart.
+- **What is a ROI?** The region of interest — it limits where the algorithm searches,
+  avoiding false detections and speeding things up.
+- **Red fit result?** A red overlay means the fit failed — re-check the ROI/parameters.
+
+## Advanced tips
+
+- Drag directly in the image to move/resize the ROI; make sure it fully contains the feature.
+- Start from defaults and change **one** parameter at a time; record the effect.
+- For speed, keep the ROI small and pick the lightest edge method that meets accuracy.
+
+## Process-chain recipes
+
+A **recipe** is the complete inspection program for a part/process: ordered steps (each =
+algorithm + parameters + ROI), a preprocessing pipeline, and between-step PASS/NG logic
+(AND/OR + geometric constraints).
+
+- **Save / load** — the recipe name + Save/Load store the whole chain as
+  `<exe>/recipes/<name>.json`.
+- **Steps** — `+ Add current algorithm` appends the tuned algorithm; reorder/edit/remove.
+  **12 algorithms** are supported: circle/line/ellipse/rectangle fit, template match, blob
+  analysis, golden-template diff, scratch, crack, OCR, barcode/QR, DataMatrix.
+- **Multi-shot** — edit a step to assign it to a **photo point (shot)** (or "group into new
+  shot") and give that shot an **image path** (offline), **position X/Y**, **image slot** and
+  an **emit tag** (point source for aggregate fits). Multi-shot recipes save as **v4**.
+- **Aggregate fits (cross-shot)** — add `fit_rect_from_points` / `fit_rect_from_lines` /
+  `fit_line_from_points` / `fit_circle_from_points` and list the emit tags. They run after
+  **all shots** finish. Recipes containing aggregates save as **v4.1**.
+- **Logic** — `AND (all pass)` / `OR (any pass)`.
+- **Constraints** — center distance / radius ratio / size ratio / angle diff / equidistant /
+  distance to reference line / symmetry; distance and symmetry may judge in px or mm.
+- **Run recipe** — executes all steps in the background and shows a per-shot grouped result
+  table (# / Shot / Algorithm / Pose / Present / Defect / String / Status / Time) + the
+  constraint verdicts + the overall verdict.
+
+See **[Recipe & geometric-constraint guide](RECIPE_GUIDE.md)** and
+**[Recipe IPC protocol](RECIPE_IPC_PROTOCOL.md)**.
+
+## Engineering vs Run mode
+
+The `Engineering` / `Run` toggle in the toolbar switches modes; the choice is saved.
+
+| Mode | Purpose | UI |
+|---|---|---|
+| **Engineering** (default) | tune recipes, parameters, calibrate ROI | all controls: recipe editor, algorithm tree, parameter panel, Run/Batch/Load Config; ROI draggable |
+| **Run** | production; prevent accidental edits | hides the editors/parameter panel; keeps the read-only step/constraint list and the **Run recipe** button; ROI locked |
+
+Images and results remain visible in Run mode, and recipe load / parameter writes still work.
+
+## Result traceability (SQLite + NG archive)
+
+Every detection (single or batch) is written to SQLite and NG images are archived:
+
+| Content | Location | Notes |
+|---|---|---|
+| Results DB | `<exe>/results.db` | table `inspection_results`: time / algorithm / image / camera / OK-NG / measurements JSON / batch; recipe runs write **one row per step** (`is_recipe`, `recipe_name`, `shot_index`, `step_index`, `total_steps`) |
+| NG archive | `<exe>/archive/ng/<date>/` | NG source images copied for review |
+
+> Deployment note: `sqldrivers/qsqlite.dll` (plus `Qt6Sql.dll`, `Qt6Concurrent.dll`) must sit
+> next to the exe, otherwise persistence silently does nothing.
+
+## Debug image capture (trace failures / reproduce)
+
+With **"Auto-save debug images"** enabled, **every algorithm execution** (single detection or
+each recipe step) writes a set for later root-cause analysis and **reproduction**:
+
+| File | Content | Purpose |
+|---|---|---|
+| `<ts>_<tag>_ok/ng_orig.png` | the original image | reproduce: reload and re-run |
+| `<ts>_<tag>_ok/ng_result.png` | original + **ROI box** + fit overlay + debug points + `OK/NG` bar | spot a wrong ROI, an empty ROI, or a fit that drifted |
+| `<ts>_<tag>_ok/ng.json` | algorithm + **full parameters (incl. ROI)** + measurements + status + image path/camera/`px_per_mm` | locate the cause and reproduce exactly |
+
+- **Tag**: single detection = algorithm name; recipe step = `shot2_step1_circle_fit`.
+- **Location**: grouped per day, `<dir>/<yyyy-MM-dd>/`; default `<exe>/debug_captures`.
+- **Options**: auto-save (master), NG-only, directory, size cap (MB); persisted.
+- **Usage / cleanup**: the panel shows `used X MB / N files`; over the cap it turns yellow
+  ("consider cleaning"). `Refresh` recomputes; `Clean` deletes oldest-first until ≤ cap
+  (with confirmation), then prunes empty day folders.
+- **No compression**: PNGs are already compressed — use day-folders + a size cap instead.
+
+## Measurement algorithms
+
+Arc fit, caliper and corner detection parameters are documented in
+**[Algorithm usage guide](ALGO_USAGE_GUIDE.md)**.
+
+## Support
+
+Open an issue at <https://github.com/binary-pixels/visionlab-sdk/issues>.
