@@ -29,11 +29,16 @@ itself is what runs a machine in production and requires a license.
 
 ## Evaluation vs commercial
 
-- **Evaluation** — for testing on your own images/parts. Time-limited and/or single-machine.
-  Ideal to run our **HALCON comparison** and your acceptance samples
+- **Evaluation** — **time-limited** (e.g. 30 days) and machine-bound; for testing on your own
+  images/parts. Ideal to run our **HALCON comparison** and your acceptance samples
   (see [`VERSUS_HALCON.md`](VERSUS_HALCON.md)).
-- **Commercial** — per-device or per-seat terms for production deployment, including support
-  and updates. Discuss specifics in the license-request issue.
+- **Commercial — perpetual, node-locked** — a **permanent** license bound to the machine: the
+  production line **never stops** because of licensing. Sold **per device** (or per seat),
+  with an **optional annual maintenance/support subscription** for updates and support.
+  Discuss specifics in the license-request issue.
+
+> **Production licenses do not expire.** They are perpetual and node-locked. Only
+> *evaluation* licenses are time-limited. Renewing does not affect a running line.
 
 ## What runs offline
 

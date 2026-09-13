@@ -102,7 +102,8 @@ See [`docs/PLUGIN_INTEGRATION_GUIDE.md`](docs/PLUGIN_INTEGRATION_GUIDE.md) and
 
 - **SDK / ABI / sample code / docs** in this repository: **Apache License 2.0** (see [`LICENSE`](LICENSE)).
   Use them freely, including commercially.
-- **Runtime engine**: **proprietary**, licensed **per device / per seat**. It is *not* in this
+- **Runtime engine**: **proprietary**, licensed **perpetually (node-locked) per device / per
+  seat**, with an optional **annual maintenance/support subscription**. It is *not* in this
   repository and is distributed **on request, with a license key**. Copying it does not grant
   a license.
 
