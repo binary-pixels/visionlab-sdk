@@ -1,0 +1,47 @@
+name: Request the runtime (license key)
+description: Ask for a VisionLab runtime evaluation or commercial license
+title: "[License] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in VisionLab. The **SDK** in this repo is Apache-2.0 and
+        needs no license; the **runtime** engine is proprietary and requires a machine-bound
+        license. Fill this in and we will follow up with a fingerprint tool.
+
+  - type: dropdown
+    id: license_type
+    attributes:
+      label: License type
+      options:
+        - Evaluation
+        - Commercial (per device)
+        - Commercial (per seat)
+    validations:
+      required: true
+
+  - type: input
+    id: use_case
+    attributes:
+      label: Use case
+      description: What are you inspecting/measuring? (e.g. SMT AOI, hole measurement, defect detection)
+      placeholder: e.g. PCB solder-joint inspection, ~2 k parts/hour
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: OS / hardware
+      description: Target machine OS and architecture
+      placeholder: e.g. Windows 10/11 x64
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Number of machines/seats, timeline, integration model (plugin vs host SDK), etc.
+    validations:
+      required: false
