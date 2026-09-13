@@ -111,7 +111,8 @@ See [`docs/PLUGIN_INTEGRATION_GUIDE.md`](docs/PLUGIN_INTEGRATION_GUIDE.md) and
 
 1. Open a **[license request issue](https://github.com/binary-pixels/visionlab-sdk/issues/new?template=license_request.yml)**
    (evaluation or commercial; state your OS and use case).
-2. You receive a small tool that prints this machine's **fingerprint**.
+2. Download [`getuuid.exe`](https://github.com/binary-pixels/visionlab-sdk/releases/latest/download/getuuid.exe)
+   (a single self-contained exe) and run it on the target machine to print its **fingerprint**.
 3. Send the fingerprint back; you get a `license.json` **bound to that machine**.
 4. Put `license.json` next to the runtime executable and run.
 

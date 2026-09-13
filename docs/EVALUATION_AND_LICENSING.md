@@ -21,8 +21,9 @@ itself is what runs a machine in production and requires a license.
    - **Type**: evaluation or commercial
    - **Use case** (e.g. "SMT AOI", "hole measurement", …)
    - **OS / hardware** (Windows version, x64)
-2. **Get a fingerprint tool.** You receive a small utility (`getuuid.exe`) that prints this
-   machine's hardware fingerprint.
+2. **Get the fingerprint tool** — download
+   [`getuuid.exe`](https://github.com/binary-pixels/visionlab-sdk/releases/latest/download/getuuid.exe)
+   (a single, self-contained exe; no install needed).
 3. **Run it on the target machine** and send back the fingerprint (a text file).
 4. **Receive `license.json`** — a license key **bound to that machine**.
 5. **Install**: put `license.json` next to the runtime executable and start it.
