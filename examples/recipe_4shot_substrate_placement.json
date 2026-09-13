@@ -1,0 +1,111 @@
+{
+  "recipe_version": "4.1",
+  "recipe_name": "4shot-substrate-frame-placement (example)",
+  "coordinate_frame": "machine",
+  "calib": { "px_per_mm": 12.0, "cam_to_machine_deg": 0.0 },
+  "logic": "AND",
+
+  "shots": [
+    {
+      "position": { "x": 0.0, "y": 0.0 },
+      "image_slot": 0,
+      "camera": 0,
+      "light": { "program": 1, "intensity": 80 },
+      "image": "teach/P1_top_seg1.png",
+      "transform": { "mode": "from_position" },
+      "steps": [
+        {
+          "algorithm": "line_fit",
+          "emit": "T1",
+          "parameters": {
+            "roi": { "type": "rotated_rect", "center": { "x": 190, "y": 120 }, "length": 260, "width": 60, "angle": 0 },
+            "ransac": { "iterations": 500, "inlier_distance": 3, "min_inliers": 6 },
+            "edge_detection": { "method": "canny", "canny_low": 100, "canny_high": 200, "sobel_ksize": 3, "subpixel_step": 0.5 }
+          }
+        }
+      ]
+    },
+    {
+      "position": { "x": 120.0, "y": 0.0 },
+      "image_slot": 1,
+      "camera": 0,
+      "light": { "program": 1, "intensity": 80 },
+      "image": "teach/P2_top_seg2.png",
+      "transform": { "mode": "from_position" },
+      "steps": [
+        {
+          "algorithm": "line_fit",
+          "emit": "T2",
+          "parameters": {
+            "roi": { "type": "rotated_rect", "center": { "x": 190, "y": 120 }, "length": 260, "width": 60, "angle": 0 },
+            "ransac": { "iterations": 500, "inlier_distance": 3, "min_inliers": 6 },
+            "edge_detection": { "method": "canny", "canny_low": 100, "canny_high": 200, "sobel_ksize": 3, "subpixel_step": 0.5 }
+          }
+        }
+      ]
+    },
+    {
+      "position": { "x": 0.0, "y": 0.0 },
+      "image_slot": 2,
+      "camera": 0,
+      "light": { "program": 2, "intensity": 80 },
+      "image": "teach/P3_left_seg1.png",
+      "transform": { "mode": "from_position" },
+      "steps": [
+        {
+          "algorithm": "line_fit",
+          "emit": "L1",
+          "parameters": {
+            "roi": { "type": "rotated_rect", "center": { "x": 120, "y": 150 }, "length": 220, "width": 60, "angle": 90 },
+            "ransac": { "iterations": 500, "inlier_distance": 3, "min_inliers": 6 },
+            "edge_detection": { "method": "canny", "canny_low": 100, "canny_high": 200, "sobel_ksize": 3, "subpixel_step": 0.5 }
+          }
+        }
+      ]
+    },
+    {
+      "position": { "x": 0.0, "y": 120.0 },
+      "image_slot": 3,
+      "camera": 0,
+      "light": { "program": 2, "intensity": 80 },
+      "image": "teach/P4_left_seg2.png",
+      "transform": { "mode": "from_position" },
+      "steps": [
+        {
+          "algorithm": "line_fit",
+          "emit": "L2",
+          "parameters": {
+            "roi": { "type": "rotated_rect", "center": { "x": 120, "y": 150 }, "length": 220, "width": 60, "angle": 90 },
+            "ransac": { "iterations": 500, "inlier_distance": 3, "min_inliers": 6 },
+            "edge_detection": { "method": "canny", "canny_low": 100, "canny_high": 200, "sobel_ksize": 3, "subpixel_step": 0.5 }
+          }
+        }
+      ]
+    }
+  ],
+
+  "aggregates": [
+    { "algorithm": "fit_line_from_points", "points": [ "T1", "T2" ], "name": "top" },
+    { "algorithm": "fit_line_from_points", "points": [ "L1", "L2" ], "name": "left" },
+    { "algorithm": "build_frame", "lines": [ "top", "left" ], "x_axis": "top", "handedness": "right", "name": "substrate" },
+    {
+      "algorithm": "placement_pattern",
+      "frame": "substrate",
+      "name": "place",
+      "mode": "grid",
+      "origin": { "x": 10.0, "y": 8.0 },
+      "angle": 0.0,
+      "rows": 2,
+      "cols": 3,
+      "pitch_x": 12.0,
+      "pitch_y": 10.0,
+      "dtheta": 0.0,
+      "snake": false
+    }
+  ],
+
+  "constraints": [
+    { "type": "angle_diff", "a": 4, "b": 5, "target_deg": 90.0, "tol_deg": 0.5 },
+    { "type": "measure_range", "a": 7, "field": "count", "min": 6, "max": 6 }
+  ]
+}
