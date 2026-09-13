@@ -21,12 +21,18 @@ itself is what runs a machine in production and requires a license.
    - **Type**: evaluation or commercial
    - **Use case** (e.g. "SMT AOI", "hole measurement", …)
    - **OS / hardware** (Windows version, x64)
-2. **Get the fingerprint tool** — download
+2. **Download the runtime** — the Windows x64 evaluation build is attached to the
+   [latest release](https://github.com/binary-pixels/visionlab-sdk/releases/latest)
+   (`VisionLab-runtime-win64.zip`). Unzip it.
+3. **Get the fingerprint tool** — download
    [`getuuid.exe`](https://github.com/binary-pixels/visionlab-sdk/releases/latest/download/getuuid.exe)
-   (a single, self-contained exe; no install needed).
-3. **Run it on the target machine** and send back the fingerprint (a text file).
+   (a single, self-contained exe; no install needed), run it on the target machine, and send
+   back the printed fingerprint.
 4. **Receive `license.json`** — a license key **bound to that machine**.
-5. **Install**: put `license.json` next to the runtime executable and start it.
+5. **Install**: put `license.json` next to `VisionLab.exe` and start it.
+
+> The runtime **will not start without a valid `license.json`** — that is the point of the
+> key. Everything else (SDK, plugins, docs) works without a license.
 
 ## Evaluation vs commercial
 
