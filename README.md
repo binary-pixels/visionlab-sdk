@@ -102,8 +102,8 @@ See [`docs/PLUGIN_INTEGRATION_GUIDE.md`](docs/PLUGIN_INTEGRATION_GUIDE.md) and
 | [`docs/USER_MANUAL.md`](docs/USER_MANUAL.md) · [`docs/ALGO_USAGE_GUIDE.md`](docs/ALGO_USAGE_GUIDE.md) | Using the tool and the algorithms |
 | [`docs/TRAINING_GUIDE.md`](docs/TRAINING_GUIDE.md) | Dataset annotation + YOLOv8 training / test / ONNX export |
 | [`docs/VERSUS_HALCON.md`](docs/VERSUS_HALCON.md) | Capability comparison and positioning |
-
-> Some documents are currently Chinese-first; English translations are in progress.
+| [`tools/dataset/`](tools/dataset/README.md) | Video frame extraction, 4K tiling, dataset layout helpers |
+| [`tools/patchcore/`](tools/patchcore/README.md) | PatchCore anomaly detection — backbone export, memory bank, heatmaps |
 
 ## Licensing
 
@@ -113,6 +113,14 @@ See [`docs/PLUGIN_INTEGRATION_GUIDE.md`](docs/PLUGIN_INTEGRATION_GUIDE.md) and
   seat**, with an optional **annual maintenance/support subscription**. It is *not* in this
   repository and is distributed **on request, with a license key**. Copying it does not grant
   a license.
+
+### Third-party components in this repository
+
+`shared/json.hpp` is **nlohmann/json**, © 2013– Niels Lohmann, licensed under the **MIT
+License** (full text: <https://github.com/nlohmann/json/blob/develop/LICENSE.MIT>). The bundled
+runtime also includes third-party components (Qt under LGPL-3.0, OpenCV under Apache-2.0, and
+others); their notices and licence texts ship inside the runtime package as
+`THIRD_PARTY_NOTICES.md` + `licenses/`.
 
 ### Getting the runtime (key on request)
 

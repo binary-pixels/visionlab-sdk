@@ -2,8 +2,8 @@
 
 Build a custom detector from your own images — **annotate** a dataset, **train** a YOLOv8
 model in-tool (C++ / LibTorch, **no Python required**), **test** it, and **export** it to ONNX
-for use in inspection. The anomaly-detection trainer (PatchCore) is covered separately in
-[`PATCHCORE_GUIDE.md`](PATCHCORE_GUIDE.md).
+for use in inspection. **PatchCore** anomaly detection (unsupervised — learn from defect-free
+images) is a separate trainer on the same **Train** tab; see §10.
 
 ## 1. Pipeline
 
@@ -186,8 +186,37 @@ and by the annotation **AI-assist** (§2).
 - Start from a **pretrained checkpoint** for small datasets.
 - Watch **`mAP50-95`** and the val-loss curve; export the `best.pt`.
 
-## 10. Related
+## 10. Anomaly detection (PatchCore)
 
-- [`PATCHCORE_GUIDE.md`](PATCHCORE_GUIDE.md) — anomaly (unknown-defect) training.
+For **unknown-defect** detection the Train tab also has a **PatchCore** page. Unlike YOLOv8 it is
+**unsupervised**: give it a folder of **defect-free** images and it learns "what normal looks
+like" — no labelled defects required (5–10 good images are often enough).
+
+- **Backbone (.pt)** — a DINOv2 backbone pre-exported to TorchScript; it turns images into
+  patch features.
+- **Good images** — the folder of normal samples.
+- **Output bank** — where the built *memory bank* (the "normal fingerprint") is written.
+
+At inference each patch of the test image is compared against the memory bank; patches that
+differ from everything "normal" light up on a heatmap, and the image score above a threshold is
+flagged as an anomaly.
+
+| Parameter | Default | Notes |
+|---|---|---|
+| **Input size** | 224 | must match the size the backbone was exported at |
+| **Patch radius** | 1 | neighbourhood aggregation: `0` for fine texture, `2` for rough surfaces |
+| **Coreset ratio** | 0.10 | memory-bank keep ratio: raise it for few images, lower it if you have many |
+
+The page's test panel loads a memory bank and runs a folder of test images, writing annotated
+heatmaps so you can pick a threshold.
+
+The backbone and memory bank can also be produced from the command line with the
+[`tools/patchcore/`](../tools/patchcore/README.md) scripts (`export_backbone.py` → `build_memory_bank.py`
+→ `infer_heatmaps.py`); they load the same two `.pt` files the page uses.
+
+## 11. Related
+
+- [`tools/patchcore/`](../tools/patchcore/README.md) — command-line PatchCore toolchain (backbone + memory bank + heatmaps).
+- [`tools/dataset/`](../tools/dataset/README.md) — video frame extraction, 4K tiling, dataset layout.
 - [`RECIPE_GUIDE.md`](RECIPE_GUIDE.md) — using detection/measurement results in a recipe.
 - [`ALGO_USAGE_GUIDE.md`](ALGO_USAGE_GUIDE.md) — OCR / template-match / defect algorithm tuning.
