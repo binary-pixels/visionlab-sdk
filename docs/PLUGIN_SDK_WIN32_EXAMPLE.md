@@ -248,5 +248,7 @@ cmake .. && cmake --build . --config Release
 
 ## See also
 
+- **Compilable host projects** ship in this repository: `Master/QtHost/sample/` (C++/Qt) and
+  `Master/WpfHost/sample/` (C#). This Win32 example uses the same C++ SDK.
 - [Quick Start](PLUGIN_SDK_QUICK_START.md) · [Qt example](PLUGIN_SDK_QT_EXAMPLE.md)
 - [API reference](PLUGIN_SDK_API_REFERENCE.md)

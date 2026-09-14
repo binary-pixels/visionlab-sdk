@@ -230,5 +230,8 @@ cmake --build . --config Release
 
 ## See also
 
+- **Compilable project:** `Master/QtHost/sample/` in this repository —
+  `cmake -S . -B build -DCMAKE_PREFIX_PATH=<qt> && cmake --build build`
+  (needs Qt6 Core + OpenCV; run with `VisionLab.exe` next to the exe).
 - [Quick Start](PLUGIN_SDK_QUICK_START.md) · [API reference](PLUGIN_SDK_API_REFERENCE.md)
 - [Host developer guide](PLUGIN_HOST_DEV_GUIDE.md) · [Win32 example](PLUGIN_SDK_WIN32_EXAMPLE.md)
