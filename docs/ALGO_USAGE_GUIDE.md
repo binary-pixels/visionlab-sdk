@@ -1,6 +1,15 @@
-# Algorithm Usage Guide
+# Advanced Measurement Algorithms — Usage Guide
 
-Covers **Arc Fit**, **Caliper**, **Corner Detect**, **Blob Analysis**, and **Golden Template**.
+This guide covers the **advanced measurement** algorithms — **Arc Fit**, **Caliper**,
+**Corner Detect**, **Blob Analysis**, and **Golden Template** — with their ROI setup,
+parameters, outputs and common issues.
+
+> **This is not the full algorithm list.** Circle / line fitting parameters are documented in
+> [`USER_MANUAL.md`](USER_MANUAL.md); the complete set of 16 step algorithms (circle / line /
+> ellipse / rectangle / arc fit, template match, caliper, corner, blob, golden-template,
+> scratch, crack, color analysis, OCR, barcode, DataMatrix) and their outputs are in
+> [`RECIPE_GUIDE.md`](RECIPE_GUIDE.md) §3. The parameter names below are the **UI labels**;
+> the corresponding recipe JSON keys are the algorithm schema fields.
 
 ---
 
