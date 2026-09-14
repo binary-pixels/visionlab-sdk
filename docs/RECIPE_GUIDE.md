@@ -172,7 +172,7 @@ frame at their corner → generate a placement array.
 | `golden_template` | reference-image diff | defect_count, defect_total_area |
 | `scratch_detect` | scratch detection | defect_count, defect_total_area |
 | `crack_detect` | crack detection | crack_count, crack_coverage |
-| `color_analysis` | color grading | color metrics (ΔE), grade |
+| `color_analysis` | color analysis | color_coverage, color_region_count, color_total_area, color_first_area, color_dominant_ratio (+BGR) |
 | `ocr` | text recognition | ocr_text, ocr_length |
 | `barcode` | barcode / QR | barcode_count, barcode_texts[], barcode_first_text |
 | `data_matrix` | DataMatrix | dm_count, dm_texts[], dm_first_text |

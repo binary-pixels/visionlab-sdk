@@ -468,11 +468,24 @@ dominant-color readout. Use for color presence/grading and coverage checks.
 | Uniformity (`check_uniformity`) / threshold / grid | off / 30 / 16 | evenness check |
 
 ### Outputs
-Region count and coverage (shown in the result); dominant BGR colors with ratios.
+Judged scalar measurement fields (for `measure_range` / constraints):
 
-> **Note**: Color Analysis is a **visualization / coverage** step — it does **not** currently
-> emit scalar measurement fields, so it can't feed `measure_range`/constraints directly. For a
-> **judged count**, use **Blob Analysis** (optionally after a color pre-filter).
+| Field | Meaning |
+|---|---|
+| `color_coverage` | target-color coverage 0–1 |
+| `color_region_count` | number of qualifying regions |
+| `color_total_area` | summed region area (px²; adds `color_total_area_mm2` when calibrated) |
+| `color_first_area` | largest region area (px²; adds `color_first_area_mm2` when calibrated) |
+| `color_dominant_ratio` | dominant-color ratio 0–1 (plus `color_dominant_b/g/r`) |
+| `color_uniform` / `color_std_max` | with Uniformity on: evenness (1/0) and local std peak |
+
+Each region's **centroid is published to the point pool** (`points`) for aggregate fits /
+`center_distance`; the largest region's centroid becomes the step pose (`cx`/`cy`).
+
+> **Note**: Color Analysis emits scalar measurements, so you can gate on it directly with
+> `measure_range` (e.g. `color_coverage ∈ [0.10, 0.30]`, `color_region_count ∈ [1, 1e9]`). For
+> thin scratches/cracks use `scratch_detect`/`crack_detect`; for a count filtered by shape use
+> **Blob Analysis** (optionally after a color pre-filter).
 
 ### Tips
 - Set the HSV bounds from a sample; H is 0–179 (OpenCV scale). Tighten **Min area** /
