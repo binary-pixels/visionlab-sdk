@@ -1,0 +1,27 @@
+<!--
+  Standalone build for the C# host sample (VisionLab SDK, out-of-process integration).
+
+    dotnet build -c Release
+    dotnet run                    # place VisionLab.exe next to the built exe
+
+  Reuses the shipped host client (../PluginIpc.cs) and the placement helper
+  (../PlacementExpand.cs). Pure .NET — no WPF/WinForms dependency.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>sample_host</AssemblyName>
+    <RootNamespace>WpfHost</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../PluginIpc.cs" />
+    <Compile Include="../PlacementExpand.cs" />
+  </ItemGroup>
+
+</Project>

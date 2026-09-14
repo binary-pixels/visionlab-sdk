@@ -78,6 +78,10 @@ ipc.send_start_recipe(recipe_json); ipc.send_push_shot(img, 0); ipc.send_finish_
 await _host.RunRecipeAsync(images, recipeJson);
 ```
 
+**Compilable samples** are included — build them directly:
+- `Master/QtHost/sample/` — `cmake -S . -B build -DCMAKE_PREFIX_PATH=<qt> && cmake --build build`
+- `Master/WpfHost/sample/` — `dotnet build -c Release`
+
 See [`docs/PLUGIN_INTEGRATION_GUIDE.md`](docs/PLUGIN_INTEGRATION_GUIDE.md) and
 [`docs/RECIPE_IPC_PROTOCOL.md`](docs/RECIPE_IPC_PROTOCOL.md).
 
