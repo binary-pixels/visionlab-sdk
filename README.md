@@ -29,7 +29,7 @@ protocol, host-side SDKs, sample plugins/recipes, and user/feature documentation
 - Sub-pixel **shape fitting**: circle, line, ellipse, rectangle.
 - **Template matching** (gradient-orientation, rotation-invariant).
 - **Blob analysis**, **golden-template diff**, **scratch** / **crack** detection.
-- **OCR** (DNN / dot-matrix / VLM), **barcode / QR**, **DataMatrix**.
+- **OCR** (DNN / dot-matrix), **barcode / QR**, **DataMatrix**.
 - **Unsupervised anomaly detection** (PatchCore-style — build a library from good parts,
   flag anything off the normal feature manifold) for unknown defects.
 - **Process-chain recipes**: multi-shot capture, cross-field-of-view coordinate

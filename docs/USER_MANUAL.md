@@ -12,7 +12,7 @@ Main capabilities:
 - **Shape fitting** — circle, line, ellipse, rectangle (sub-pixel).
 - **Template matching** (gradient-orientation, rotation-invariant).
 - **Blob analysis**, **golden-template diff**, **scratch** / **crack** detection.
-- **OCR** (DNN / dot-matrix / VLM), **barcode / QR**, **DataMatrix**.
+- **OCR** (DNN / dot-matrix), **barcode / QR**, **DataMatrix**.
 - **Unsupervised anomaly detection** for unknown defects (library built from good parts).
 - **Batch processing** with statistics and CSV export.
 - **Recipes** — ordered steps + preprocessing + between-step PASS/NG logic.
