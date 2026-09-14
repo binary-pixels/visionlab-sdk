@@ -1,8 +1,8 @@
 # Advanced Measurement Algorithms — Usage Guide
 
 This guide covers the **advanced measurement** algorithms — **Arc Fit**, **Caliper**,
-**Corner Detect**, **Blob Analysis**, and **Golden Template** — with their ROI setup,
-parameters, outputs and common issues.
+**Corner Detect**, **Blob Analysis**, **Golden Template**, **Template Match**, and **OCR** —
+with their ROI setup, parameters, outputs and common issues.
 
 > **This is not the full algorithm list.** Circle / line fitting parameters are documented in
 > [`USER_MANUAL.md`](USER_MANUAL.md); the complete set of 16 step algorithms (circle / line /
@@ -247,7 +247,97 @@ coordinates) and a red overlay box.
 
 ---
 
-## 6. General
+## 6. Template Match
+
+Locates a trained template using **gradient-orientation** features, tolerant of rotation
+within a configured angle range. Use it for part / logo / pad presence, orientation and count
+(e.g. "find all connectors", "check the pad angle").
+
+### Model (template)
+A template must be **trained** from a sample patch and saved as a model file; matching uses
+`model.path`. The training parameters below are set when the model is created.
+
+### Search ROI
+A dedicated **template ROI** (drag the region to search) sets where the matcher looks;
+`search_roi` in the recipe holds its rectangle. A tight ROI is faster and less prone to false
+matches.
+
+### Parameters
+| Label (JSON key) | Meaning | Range / default |
+|---|---|---|
+| Min score (`score_threshold`) | minimum match score to accept | 0–100, default 70 |
+| Max count (`max_count`) | maximum instances returned | 1–50, default 5 |
+| Start angle (`train.angle_start`) | lowest rotation to train/look for | −180–180°, default −30 |
+| End angle (`train.angle_end`) | highest rotation | −180–180°, default 30 |
+| Angle step (`train.angle_step`) | rotation granularity | 1–30°, default 5 |
+| Features (`train.num_features`) | number of template features | 16–256, default 200 |
+| Weak gradient (`train.weak_threshold`) | low gradient threshold for feature extraction | 1–200, default 120 |
+| Strong gradient (`train.strong_threshold`) | high gradient threshold | 1–255, default 255 |
+
+### Outputs
+cx, cy, **angle**, **match_score** — up to `max_count` instances, each with its rotation and
+score. Feed them to constraints (e.g. `angle_diff`, `center_distance`).
+
+### Tips
+- Train the model from a clean, centered sample under the production lighting.
+- Keep the angle range just wide enough for the real rotation (wider = slower, more false hits).
+- Raise **Min score** until false matches disappear, then back off slightly.
+
+### Common issues
+| Symptom | Fix |
+|---|---|
+| No / weak matches | lower **Min score**; retrain from a matching sample (lighting/scale) |
+| Many false matches | narrow the ROI / angle range; raise **Min score** |
+| Angle off | lower **Angle step** (e.g. 1–2°) |
+| Slow | tighter ROI + angle range; fewer **Features** |
+
+---
+
+## 7. OCR
+
+Recognizes text with a **DNN** model or the built-in **dot-matrix** reader. Use it for serial
+numbers, date codes, laser/ink markings and dot-matrix prints.
+
+### ROI
+A **rectangle** ROI around the text — the full string with a small margin, roughly horizontal
+(a few degrees is fine).
+
+### Parameters
+| Label (JSON key) | Meaning | Range / default |
+|---|---|---|
+| Mode (`mode`) | `auto` / `dnn` / `dotmatrix` | default `auto` |
+| Detect model (`det_model`) | text-detection model file (DNN) | path, optional |
+| Recognize model (`rec_model`) | text-recognition model file (DNN) | path, optional |
+| Confidence (`conf_thresh`) | minimum per-character confidence | 0–1, default 0.5 |
+| CLAHE (`clahe`) | local-contrast pre-processing | off |
+| Invert (`invert`) | invert polarity before reading | off |
+
+- **Mode**: `auto` uses the DNN path when a recognize model is set, otherwise dot-matrix;
+  force `dnn` or `dotmatrix` to pin the reader.
+- **Models**: the DNN models are **provided by you** (not bundled) — set both a detection and a
+  recognition model for best results.
+
+### Outputs
+`ocr_text`, `ocr_length`.
+
+### Tips
+- Light for even, high contrast on the characters (no glare, no shadow across the string).
+- Set **Invert** if the text polarity is the opposite of what the reader expects.
+- Enable **CLAHE** for uneven / low-contrast stamps.
+- Dot-matrix: keep the dot pitch ≥ ~3 px; a magnified / higher-resolution view helps small
+  stamps.
+
+### Common issues
+| Symptom | Fix |
+|---|---|
+| Empty / wrong text | improve lighting; toggle **Invert**; enable **CLAHE** |
+| Partial string | enlarge the ROI |
+| DNN not used | set `rec_model` or force **Mode** = `dnn` |
+| Dot-matrix misread | zoom in / higher resolution; try **Mode** = `dotmatrix` |
+
+---
+
+## 8. General
 
 ### ROI interaction
 Drag inside to move; drag the corner handles of a rectangle to resize; drag the sector center
