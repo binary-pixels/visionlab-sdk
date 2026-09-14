@@ -1,0 +1,19 @@
+# Build outputs
+build/
+Build/
+[Oo]ut/
+bin/
+obj/
+*.user
+
+# Runtime artifacts that must not be committed
+license.json
+data.txt
+*.dll
+*.pdb
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vs/
+.idea/

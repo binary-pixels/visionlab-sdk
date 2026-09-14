@@ -1,40 +1,38 @@
 # Plugin SDK — Delivery & Packaging
 
-How the **out-of-process host SDK** is packaged and how a customer integrates it. The SDK is
+How the **out-of-process host SDK** is delivered and how a customer integrates it. The SDK is
 a **pure static library** (no third-party dependencies), so it links into your executable —
 nothing extra to ship.
 
-## SDK package layout
+## SDK layout
+
+The SDK is provided **as source** in this repository; its `CMakeLists.txt` defines the
+`PluginSDK` static-library target:
 
 ```
-plugin_sdk/
-├── include/
-│   ├── PluginHostLauncher.h     # process management (launch/embed/track the runtime)
-│   ├── PluginHostInterface.h    # IPC interface (send image + params, get result)
-│   └── PluginHostInterfaceExt.h # extended interface
-└── lib/
-    ├── PluginSDK.lib            # Release static library
-    └── PluginSDKd.lib           # Debug static library (optional)
+shared/plugin_sdk/
+├── CMakeLists.txt            # defines target `PluginSDK` (static library)
+├── PluginHostLauncher.h/.cpp # host: process management (launch / embed / track the runtime)
+├── PluginHostInterface.h/.cpp# host: IPC interface (send image + params, get the result)
+├── PluginHostInterfaceExt.h  # host: multi-camera slot API
+├── PluginInterface.h/.cpp    # plugin side (for writing your own runtime-side plugin)
+└── SharedMemLayout.h         # V3 protocol layout (self-contained; no internal includes)
 ```
 
-The SDK is delivered as **headers + a prebuilt static library only** — its source is not
-included.
+> The SDK **builds from source** — there is no prebuilt `.lib` in the repository. Adding it as
+> a CMake subdirectory builds `PluginSDK` for you.
 
 ## Integrate (3 steps)
 
 ### 1. Add the SDK to your build
 
-Copy `plugin_sdk/` into your project and, in `CMakeLists.txt`:
-
 ```cmake
-add_library(PluginSDK STATIC IMPORTED)
-set_target_properties(PluginSDK PROPERTIES
-    IMPORTED_LOCATION         "${CMAKE_CURRENT_SOURCE_DIR}/plugin_sdk/lib/PluginSDK.lib"
-    IMPORTED_LOCATION_DEBUG   "${CMAKE_CURRENT_SOURCE_DIR}/plugin_sdk/lib/PluginSDKd.lib"
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/plugin_sdk/include"
-)
+add_subdirectory(path/to/shared/plugin_sdk)   # defines the `PluginSDK` target
 target_link_libraries(MyApp PRIVATE PluginSDK)
 ```
+
+(`PluginSDK` is a `STATIC` library with `PUBLIC` include dirs; on Windows it links
+`user32` / `kernel32` itself.)
 
 ### 2. Include the headers
 

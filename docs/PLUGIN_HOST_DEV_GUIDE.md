@@ -165,8 +165,9 @@ slot independently. Keep the session alive by periodically calling
 ```
 
 `<windows.h>` must come before Qt headers (or be guarded by `#ifdef _WIN32`) to avoid macro
-clashes. In CMake, either add the SDK as a subdirectory (`add_subdirectory`) or link the
-prebuilt `PluginSDK.lib`.
+clashes. In CMake, add the SDK as a subdirectory — `add_subdirectory(shared/plugin_sdk)`
+defines the `PluginSDK` static-library target; then `target_link_libraries(MyApp PRIVATE
+PluginSDK)`. The SDK builds from source.
 
 The container widget must be a native window with a valid `winId()` and a stable on-screen
 position; prefer a plain `QWidget` (not a bordered `QFrame`, which shifts by 1 px).
