@@ -17,3 +17,7 @@ data.txt
 Thumbs.db
 .vs/
 .idea/
+
+# Python
+__pycache__/
+*.pyc

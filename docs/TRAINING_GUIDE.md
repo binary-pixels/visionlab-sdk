@@ -78,21 +78,22 @@ YOLOv8's default input is 640×640. Scaling a 3840×2160 image to 640 loses ~6×
   size.
 - **Option C — tile then train at 640** for a good speed/accuracy balance.
 
-A helper script ships with the toolkit (`tile_dataset.py`) for tiling.
+A helper script ships with the toolkit: `tools/dataset/tile_dataset.py` (with clipped labels).
 
-## 5. Train / val split
+## 5. Gather the dataset for the trainer
 
-Split the dataset before training (a `dataset.yaml` describing train/val is produced):
+`tools/dataset/split_dataset.py` collects all image/label pairs into the flat layout the
+trainer reads:
 
 ```
 split/
-├── images/train/  images/val/
-├── labels/train/  labels/val/
-├── classes.txt
-└── dataset.yaml
+├── images/
+├── labels/
+└── classes.txt
 ```
 
-The trainer also supports an in-run `val_split` (fraction held out automatically).
+No separate train/val folders are needed — the trainer holds out validation internally via its
+`val_split` parameter (default 0.2).
 
 ## 6. Training (Train tab → YOLOv8)
 
