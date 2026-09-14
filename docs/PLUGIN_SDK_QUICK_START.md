@@ -8,6 +8,21 @@ between-step geometry/constraint engine.
 > For the out-of-process model (your app drives the runtime over shared-memory IPC), see
 > [`PLUGIN_INTEGRATION_GUIDE.md`](PLUGIN_INTEGRATION_GUIDE.md) Part B.
 
+## Prerequisites
+
+Building an in-process plugin needs only three things:
+
+| Need | Provided by |
+|---|---|
+| `circle_qt_plugin.h` (the C ABI) | **this repo** — `shared/plugin_sdk/algo_plugin/` |
+| `json.hpp` (nlohmann/json, single-header, MIT) | **this repo** — `shared/json.hpp` |
+| **OpenCV** (core + imgproc) | **you install it** (vcpkg, system package, or prebuilt) — not bundled |
+
+Nothing else (no Qt, no OpenSSL) is needed for a plugin; those are only required to build the
+runtime itself. The `pin_hole` example under
+`shared/plugin_sdk/algo_plugin/examples/pin_hole/` is a complete, compilable reference — copy
+that project and replace the algorithm body.
+
 ---
 
 ## 1. The ABI in one screen
@@ -57,8 +72,10 @@ project(my_plugin LANGUAGES CXX)
 add_library(my_plugin SHARED src/my_plugin.cpp)
 target_compile_definitions(my_plugin PRIVATE CIRCLE_QT_PLUGIN_BUILD)
 target_include_directories(my_plugin PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../shared/plugin_sdk/algo_plugin)
-find_package(OpenCV REQUIRED)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../shared/plugin_sdk/algo_plugin   # circle_qt_plugin.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../shared                          # json.hpp
+    ${OpenCV_INCLUDE_DIRS})
+find_package(OpenCV REQUIRED)                # external prereq (core + imgproc)
 target_link_libraries(my_plugin PRIVATE ${OpenCV_LIBS})
 set_target_properties(my_plugin PROPERTIES PREFIX "")
 ```
@@ -68,7 +85,7 @@ set_target_properties(my_plugin PROPERTIES PREFIX "")
 ```cpp
 #include "circle_qt_plugin.h"
 #include <opencv2/opencv.hpp>
-#include <nlohmann/json.hpp>   // single-header JSON (json.hpp)
+#include <json.hpp>   // nlohmann/json single header, shipped as shared/json.hpp
 using json = nlohmann::json;
 
 static int writeJson(const json& j, char* out, int cap) {
