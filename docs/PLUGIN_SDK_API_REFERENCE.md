@@ -33,11 +33,13 @@ Three headers, three audiences:
 
 ```c
 typedef enum {
-    PLUGIN_UI_STANDALONE = 0,   /* own top-level window (default) */
     PLUGIN_UI_EMBEDDED   = 1,   /* child of a host window */
-    PLUGIN_UI_HEADLESS   = 2    /* no UI (background processing) */
+    PLUGIN_UI_STANDALONE = 2,   /* own top-level window */
+    PLUGIN_UI_HEADLESS   = 3    /* no UI (background processing) */
 } PluginUIMode;
 ```
+
+> When `SetUIMode` is not called, the runtime shows its own top-level window (standalone).
 
 ```c
 /* Create */

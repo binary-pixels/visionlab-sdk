@@ -165,13 +165,20 @@ frame at their corner → generate a placement array.
 | `ellipse_fit` | ellipse fit | cx, cy, radius(=a), width, height, angle |
 | `rectangle_fit` | rectangle fit | cx, cy, width, height, angle |
 | `template_match` | template match | cx, cy, angle, match_score |
+| `arc_fit` | circular-arc fit | cx, cy, radius, span, arc_length, chord_length |
+| `caliper` | caliper width / edge | edge points, width (Width mode), straightness |
+| `corner_detect` | corner detection | corner points (by response) |
 | `blob_analysis` | connected components | blob_count, blob_total_area, blob_first_area |
 | `golden_template` | reference-image diff | defect_count, defect_total_area |
 | `scratch_detect` | scratch detection | defect_count, defect_total_area |
 | `crack_detect` | crack detection | crack_count, crack_coverage |
+| `color_analysis` | color grading | color metrics (ΔE), grade |
 | `ocr` | text recognition | ocr_text, ocr_length |
 | `barcode` | barcode / QR | barcode_count, barcode_texts[], barcode_first_text |
 | `data_matrix` | DataMatrix | dm_count, dm_texts[], dm_first_text |
+
+In-process **plugin algorithms** (`AlgorithmType::PluginAlgo`) are steps too — see
+[`plugin_abi.md`](plugin_abi.md).
 
 Each step's measurements are available to constraints. `line_fit` also exposes its endpoints
 for `line_distance`.

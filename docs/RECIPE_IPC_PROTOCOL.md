@@ -40,7 +40,10 @@ torn reads.
 | 2 | `LoadImageFile` | params = `{"path": "..."}` |
 | 3 | `Search` | run an algorithm on the current image + params |
 | 4 | `PushAndSearch` | push an image + one algorithm's params; result carries `semantic` |
+| 5 | `GrabAndSearch` | plugin grabs an image + searches (camera mode) |
+| 6 | `OpenCamera` | open the camera-config UI |
 | 7 | `GetParams` | return current params |
+| 8 | `Resize` | host notifies a window resize `{"x","y","w","h"}` |
 | 9 | `Shutdown` | exit |
 | 10 | `RunRecipe` | whole recipe: images in slots 0..N-1 + recipe JSON |
 | 11 | `StartRecipe` | streaming session: params = full recipe JSON |

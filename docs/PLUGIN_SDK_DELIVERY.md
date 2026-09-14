@@ -91,7 +91,8 @@ connect(pollTimer, &QTimer::timeout, this, [this]() {
 pollTimer->start(100);
 ```
 
-A complete reference is in the `qt_host_minimal` example.
+A complete reference host is in [`PLUGIN_SDK_QT_EXAMPLE.md`](PLUGIN_SDK_QT_EXAMPLE.md) and the
+`Master/` sample hosts in this repository.
 
 ## Runtime deployment
 
