@@ -1,8 +1,9 @@
-# Advanced Measurement Algorithms — Usage Guide
+# Advanced Algorithms — Usage Guide
 
-This guide covers the **advanced measurement** algorithms — **Arc Fit**, **Caliper**,
-**Corner Detect**, **Blob Analysis**, **Golden Template**, **Template Match**, and **OCR** —
-with their ROI setup, parameters, outputs and common issues.
+This guide documents the **non-trivial algorithms** — arc / ellipse / rectangle fit, caliper,
+corner detect, template match, blob analysis, golden-template diff, scratch, crack, color
+analysis, OCR, barcode and DataMatrix — with their ROI setup, parameters, outputs and common
+issues. (Circle and line fit are covered in [`USER_MANUAL.md`](USER_MANUAL.md).)
 
 > **This is not the full algorithm list.** Circle / line fitting parameters are documented in
 > [`USER_MANUAL.md`](USER_MANUAL.md); the complete set of 16 step algorithms (circle / line /
@@ -337,7 +338,189 @@ A **rectangle** ROI around the text — the full string with a small margin, rou
 
 ---
 
-## 8. General
+## 8. Ellipse Fit
+
+Fits an ellipse to an elliptical edge band. Use for ovals, seals, ring outer contours, and
+where a circle fit is biased by slight ellipticity.
+
+### ROI
+An **elliptical annular sector**: center, inner/outer radii along **axis A** (major) and
+**axis B** (minor), and an orientation angle. Size the band to straddle the elliptical edge.
+
+### Parameters
+| Label (JSON key) | Default | Meaning |
+|---|---|---|
+| Center X/Y (`roi.center.x/y`) | px | ROI center |
+| Inner/Outer axis A (`roi.a_inner`/`a_outer`) | 50 / 150 px | major-axis band |
+| Inner/Outer axis B (`roi.b_inner`/`b_outer`) | 30 / 120 px | minor-axis band |
+| Angle (`roi.angle`) | 0° | ellipse orientation (−180–180) |
+| Angle gap (`filter.angle_gap_deg`) | 30° | isolated-point gap |
+| Eccentricity min/max (`filter.eccentricity_min/max`) | 0 / 1 | accept range |
+| Axis A/B min/max (`ellipse_range.*`) | 0 / 2000 px | accepted axes |
+| Inlier distance / Min inliers (`ransac.*`) | 3.0 px / 6 | robust fit |
+| Edge method (`edge_detection.method`) | canny | canny / devernay / edge_profile |
+| Tukey robust fit (`robust.tukey_refine`) / iterations / clipping | off / 200 / 10 | outlier rejection |
+
+### Outputs
+cx, cy, radius (= major axis A), **width, height, angle**.
+
+### Tips / issues
+- Set axis A ≥ axis B and match `roi.angle` to the tilt; **eccentricity min** > 0 rejects
+  near-circles. Enable **Tukey** when the edge has gaps/outliers.
+- Width/height swapped → axis A/B or `roi.angle` mismatched; jittery → raise **Min inliers**.
+
+---
+
+## 9. Rectangle Fit
+
+Fits an oriented rectangle to a rectangular part/feature. Use for chips, pads, windows,
+brackets.
+
+### ROI
+A **rotated rectangle** (center, width, height, angle) — enclose the whole rectangle.
+
+### Parameters
+| Label (JSON key) | Default | Meaning |
+|---|---|---|
+| Center X/Y (`roi.center.x/y`) | px | ROI center |
+| Width/Height (`roi.width`/`height`) | 100 / 80 px | ROI size |
+| Angle (`roi.angle`) | 0° | ROI orientation |
+| Min/Max width (`size_ranges.width_min/max`) | 10 / 200 px | accepted width |
+| Min/Max height (`size_ranges.height_min/max`) | 10 / 200 px | accepted height |
+| Edge method + Canny/Sobel/Subpixel (`edge_detection.*`) | canny, 100/200, 3, 0.5 | edge extraction |
+| RANSAC iterations/inlier/min-inliers (`ransac.*`) | 500 / 3.0 / 6 | robust fit |
+| Min-area rect (`filter.use_min_area_rect`) | off | capsule mode for tilted bars |
+| Angle tolerance (`filter.angle_tolerance`) | 10° | max edge-vs-expected angle |
+
+### Outputs
+cx, cy, **width, height, angle**.
+
+### Tips / issues
+- Match `roi.angle` to the tilt; set `size_ranges` to reject wrong-size fits. For elongated
+  caps/leads try **Min-area rect** and raise **Angle tolerance**.
+- Fails on rounded corners → raise **Inlier distance** / use min-area rect.
+
+---
+
+## 10. Scratch Detection
+
+Detects linear surface marks (scratches) via morphological top-hat / black-hat. Use for
+polished surfaces, glass, coatings.
+
+### Parameters
+| Label (JSON key) | Default | Meaning |
+|---|---|---|
+| Morph operator (`morph_op`) | both | tophat / blackhat / both / morphgrad |
+| Struct width/height (`se_width`/`se_height`) | 30 / 30 | structuring element size |
+| Threshold (`thresh_value`) | 20 | binarization threshold |
+| Min area (`min_area`) | 5 px² | minimum scratch area |
+| Min aspect ratio (`min_aspect_ratio`) | 2.0 | reject blobs, keep lines |
+
+### Outputs
+`defect_count`, `defect_total_area`.
+
+### Tips / issues
+- Struct element slightly **larger than the scratch width**; **top-hat** = bright scratches,
+  **black-hat** = dark, **both** = unknown polarity. Raise **Min aspect ratio** (3–5) to keep
+  only line-like defects.
+- Too many blobs → raise **Threshold**/**Min area**/**Min aspect ratio**; texture picked up →
+  larger struct / better lighting.
+
+---
+
+## 11. Crack Detection
+
+Detects cracks as thin dark/bright paths (+ optional coverage judgement). Use for castings,
+welds, ceramics.
+
+### Parameters
+| Label (JSON key) | Default | Meaning |
+|---|---|---|
+| Dark crack (`dark_crack`) | true | true = dark cracks |
+| Top-hat size (`tophat_size`) | 15 | enhancement element |
+| Canny low/high (`canny_low`/`canny_high`) | 30 / 90 | edge thresholds |
+| Min length (`min_length`) | 20 px | minimum crack length |
+| Coverage (`pass_coverage`) | 0.0 | max crack coverage to pass (0 = off) |
+
+### Outputs
+`crack_count`, `crack_coverage` (fraction of the ROI).
+
+### Tips / issues
+- **Dark crack** = false for bright cracks (some ceramics); tune Canny to the crack contrast;
+  set **Coverage** > 0 to make the step judge PASS/NG by total crack fraction.
+- Noise cracks → raise **Min length**/Canny; missed → lower Canny / match `tophat_size` to width.
+
+---
+
+## 12. Color Analysis
+
+Highlights pixels inside an HSV range and reports region count + coverage, plus a k-means
+dominant-color readout. Use for color presence/grading and coverage checks.
+
+### Parameters
+| Label (JSON key) | Default | Meaning |
+|---|---|---|
+| H/S/V low (`hsv_low_h/s/v`) | 0 / 0 / 0 | HSV lower bound |
+| H/S/V high (`hsv_high_h/s/v`) | 179 / 255 / 255 | HSV upper bound |
+| K-means colors (`kmeans_k`) | 5 | dominant colors reported |
+| Morph close (`morph_close`) | 5 | fill small holes |
+| Min area (`min_area`) | 50 px² | minimum region area |
+| Uniformity (`check_uniformity`) / threshold / grid | off / 30 / 16 | evenness check |
+
+### Outputs
+Region count and coverage (shown in the result); dominant BGR colors with ratios.
+
+> **Note**: Color Analysis is a **visualization / coverage** step — it does **not** currently
+> emit scalar measurement fields, so it can't feed `measure_range`/constraints directly. For a
+> **judged count**, use **Blob Analysis** (optionally after a color pre-filter).
+
+### Tips
+- Set the HSV bounds from a sample; H is 0–179 (OpenCV scale). Tighten **Min area** /
+  enable **Morph close** to clean up regions.
+
+---
+
+## 13. Barcode / QR
+
+Reads 1D barcodes and QR codes (ZXing).
+
+### Parameters
+| Label (JSON key) | Default | Meaning |
+|---|---|---|
+| Try QR (`try_qr`) | on | decode QR / 2D |
+| Try linear (`try_linear`) | on | decode 1D barcodes |
+| Scale factor (`scale_factor`) | 1.0 (0.1–10) | pre-scale before decoding |
+
+### Outputs
+`barcode_count`, `barcode_texts[]`, `barcode_first_text`.
+
+### Tips / issues
+- Raise **Scale factor** (2–4×) for small/high-density codes; even, glare-free lighting, code
+  roughly level. No decode → raise scale / improve focus; wrong text → tighten ROI to one code.
+
+---
+
+## 14. DataMatrix
+
+Reads ECC200 DataMatrix codes (incl. direct-part-marking).
+
+### Parameters
+| Label (JSON key) | Default | Meaning |
+|---|---|---|
+| Try inverted (`try_invert`) | on | also try inverted polarity |
+| CLAHE (`use_clahe`) | on | local-contrast pre-processing |
+| Multi-scale (`multi_scale`) | on | try several scales |
+
+### Outputs
+`dm_count`, `dm_texts[]`, `dm_first_text`.
+
+### Tips / issues
+- Keep **CLAHE** on for low-contrast/etched marks; **Multi-scale** helps size uncertainty. For
+  dotted DPM codes, module size should be ≥ ~4 px.
+
+---
+
+## 15. General
 
 ### ROI interaction
 Drag inside to move; drag the corner handles of a rectangle to resize; drag the sector center
