@@ -181,12 +181,25 @@ Return codes: `0` = ran (the algorithm verdict is in the result's `ok` field);
 
 ## 4. Deploy & verify
 
-1. Build the DLL (`my_plugin.dll`).
-2. Drop it where the runtime loads plugins, then start the runtime.
+1. Build the DLL — e.g. `my_plugin.dll` (x64, no `lib` prefix).
+2. **Place it in `<VisionLab>/plugins/`** (create the folder if absent). On startup the runtime
+   scans `<exe>/plugins/*.dll` and loads each one automatically.
 3. The algorithm appears in the tree as **Pin hole (customer)** with the generated form.
 4. Run it on an image; confirm `radius_px` / `diameter_px` and the green overlay.
 5. Add it as a **recipe step** — its `measurements` are consumable by constraints
    (`measure_range`, distances, etc.) exactly like built-in steps.
+
+### Deployment requirements (what the customer needs)
+- **Architecture**: x64 (match the runtime).
+- **ABI version**: must equal `CIRCLE_QT_PLUGIN_API_VERSION` (currently `1`); a mismatch is refused.
+- **OpenSSL: NOT needed.** The plugin doesn't use it; the *runtime* does, and its
+  `libcrypto-3-x64.dll` / `libssl-3-x64.dll` ship inside the runtime package.
+- **OpenCV**: if your plugin uses OpenCV, build against the **same OpenCV** the runtime ships
+  (`opencv_world4120.dll`) — it is already loaded in the process, so the import resolves.
+- **VC runtime**: the runtime folder already ships `msvcp140.dll` / `vcruntime140*.dll`; the
+  plugin reuses them.
+
+> In short: the customer drops the plugin DLL into `plugins/` — **no extra install**.
 
 ## Rules & gotchas
 
