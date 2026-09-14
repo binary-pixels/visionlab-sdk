@@ -32,6 +32,8 @@ protocol, host-side SDKs, sample plugins/recipes, and user/feature documentation
 - **OCR** (DNN / dot-matrix), **barcode / QR**, **DataMatrix**.
 - **Unsupervised anomaly detection** (PatchCore-style — build a library from good parts,
   flag anything off the normal feature manifold) for unknown defects.
+- **Dataset annotation + YOLOv8 training in-tool** (C++/LibTorch, no Python) — annotate
+  bounding boxes, fine-tune/train a detector, test it, and export ONNX for inspection.
 - **Process-chain recipes**: multi-shot capture, cross-field-of-view coordinate
   unification, measurement/compute nodes, coordinate frames and placement arrays.
 - **Verification tooling**: batch runs, GRR / repeatability reports, SQLite result logging,
@@ -98,6 +100,7 @@ See [`docs/PLUGIN_INTEGRATION_GUIDE.md`](docs/PLUGIN_INTEGRATION_GUIDE.md) and
 | [`docs/RECIPE_GUIDE.md`](docs/RECIPE_GUIDE.md) | Recipes and geometric constraints |
 | [`docs/CLI_JSON_SPEC.md`](docs/CLI_JSON_SPEC.md) | CLI JSON interface |
 | [`docs/USER_MANUAL.md`](docs/USER_MANUAL.md) · [`docs/ALGO_USAGE_GUIDE.md`](docs/ALGO_USAGE_GUIDE.md) | Using the tool and the algorithms |
+| [`docs/TRAINING_GUIDE.md`](docs/TRAINING_GUIDE.md) | Dataset annotation + YOLOv8 training / test / ONNX export |
 | [`docs/VERSUS_HALCON.md`](docs/VERSUS_HALCON.md) | Capability comparison and positioning |
 
 > Some documents are currently Chinese-first; English translations are in progress.
